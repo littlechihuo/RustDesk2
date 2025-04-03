@@ -11,8 +11,24 @@ on:
 
 jobs:
   run-flutter-tag-build:
-    uses: ./.github/workflows/flutter-build.yml
-    secrets: inherit
-    with:
-      upload-artifact: true
-      upload-tag: ${{ github.ref_name }}
+    runs-on: windows-latest  # 使用 Windows 环境（已预装 Chocolatey）
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 通过 Chocolatey 安装 Ninja
+      - name: Install Ninja via Chocolatey
+        run: choco install ninja -y
+
+      # 3. 验证 Ninja 安装
+      - name: Verify Ninja installation
+        run: ninja --version
+
+      # 4. 调用 Flutter 构建流程
+      - name: Run Flutter Build
+        uses: ./.github/workflows/flutter-build.yml
+        secrets: inherit
+        with:
+          upload-artifact: true
+          upload-tag: ${{ github.ref_name }}
